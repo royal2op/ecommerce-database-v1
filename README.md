@@ -1,100 +1,62 @@
-# ecommerce-database-v1
-Overview
+# 🛒 E-Commerce Database Architecture (SQLite) – v1
 
-This project simulates the backend data layer of a small e-commerce platform using SQLite. It is designed to demonstrate:
+A robust, relational database system designed to simulate a production-grade e-commerce backend. This project focuses on **data integrity, transactional consistency, and enforcing business logic** directly at the database layer using constraints and triggers.
 
-• Relational database design with multiple interconnected tables.
-• Order lifecycle management (pending → reserved → paid / expired / canceled).
-• Data integrity through foreign keys and constraints.
-• Business logic enforcement via triggers (e.g., stock management, payment validation).
-• Analytical queries for business intelligence.
+---
 
-The database includes seed data with realistic users, products, orders, carts, and payments to showcase practical use cases.
+## 🧠 Why I Built This
+I developed this project to deepen my understanding of:
+* **ACID Properties:** Ensuring reliable transactions.
+* **Order State Management:** Controlling the flow of data from `pending` to `paid/canceled`.
+* **Database-Level Logic:** Enforcing business rules via triggers and constraints.
+* **Data Integrity:** Protecting the system from invalid states (e.g., negative inventory) even if the application layer fails.
 
-Features
+---
 
-• Relational Schema Design: Fully normalized tables for users, products, orders, cart, and payments.
-• Order Lifecycle Management: Handles reserved stock, payments, cancellations, and expiration logic.
-• Constraints:
-  • Foreign keys to maintain relationships.
-  • CHECK constraints for status and quantities.
-  • Stock cannot go negative.
-•Triggers: Automatic enforcement of business rules:
-  • Prevent orders with insufficient stock (prevent_bad_order)
-  • Reserve stock when order is reserved (reserve_stock)
-  • Restore stock if order is canceled or expired (restore_stock)
-  • Validate payment amounts against order totals (validate_payment_amount)
-  • Reduce stock after successful payment (reduce_stock_after_payment)
+## 🗂 Database Schema (ERD)
+<img width="614" height="354" alt="image" src="https://github.com/user-attachments/assets/a8db6227-3c02-4a59-8c05-5212effa3104" />
 
-•Seed Data: Realistic example data for users, products, orders, cart items, and payments.
-•Analytical Queries: Example queries to track revenue, top-selling products, and customer activity.
+---
 
-Database Schema
+## 🚀 Key Features
 
-Tables:
+### 🔁 Automated Order Lifecycle
+Supports controlled state transitions:
+* `pending` → `reserved` → `paid`
+* `pending` → `expired`
+* `pending` → `cancelled`
 
-1. Users – Stores registered user information (username, email, country, creation date, active status).
-2. Products – Stores product details (name, description, price, stock, category, creation and update timestamps).
-3. Orders – Stores all orders including status, reserved times, payment status, and total amount.
-4. Order_Items – Stores the products included in each order, quantity, and price at purchase.
-5. Payments – Stores payment details and status for each order.
-6. Cart – Temporary storage of user-selected items before checkout.
-7. Cart_Items – Stores individual products and quantities in each cart.
+### 🛡 Defensive Database Design
+* **CHECK Constraints:** Prevents invalid states (e.g., non-negative stock).
+* **Foreign Keys:** Maintains referential integrity and prevents orphaned records.
+* **Automated Logic:** Expired or cancelled orders automatically restore inventory.
 
-Triggers:
+### ⚙️ Business Logic at the Database Layer
+Implemented using **SQLite Triggers** to ensure consistency across any system:
+* `prevent_bad_order`
+* `reserve_stock`
+* `restore_stock`
+* `validate_payment_amount`
+* `reduce_stock_after_payment`
 
-• prevent_bad_order – Prevents ordering more stock than available.
-• reserve_stock – Reduces stock when an order is reserved.
-• restore_stock – Restores stock if order expires or is canceled.
-• validate_payment_amount – Ensures payment matches order total.
-• reduce_stock_after_payment – Reduces stock after successful payment.
+---
 
-How to Run
+## 🧱 Tech Stack
+* **Database:** SQLite
+* **Design Principles:** Relational Normalization (3NF)
+* **Core Concepts:** Constraints, Triggers, Index Optimization, `EXPLAIN QUERY PLAN`
 
-1.Clone the repository or download files.
+---
 
-2. Open SQLite CLI or SQLite Browser.
+## 📊 Example Queries
 
-3. Create the database:
-
-sqlite3 ecommerce.db
-
-4. Load schema:
-
-.read schema.sql
-
-5. Load seed data:
-
-.read seed.sql
-
-6. Create indexes (optional but recommended for large datasets):
-
-.read indexes.sql
-
-7. Test queries:
-
-.read queries.sql
-
-
-Example Queries
-
-• Total revenue from paid orders:
-
+### Total Revenue
+```sql
 SELECT SUM(amount) AS total_revenue
 FROM orders
 WHERE status = 'paid';
-
-• Top-selling products:
-
-SELECT p.product_name, SUM(oi.quantity) AS total_sold
-FROM order_items oi
-JOIN products p ON oi.product_id = p.id
-GROUP BY p.product_name
-ORDER BY total_sold DESC
-LIMIT 5;
-
-• Top customers by total spending:
-
+Top Customers by Spending
+SQL
 SELECT u.username, SUM(o.amount) AS total_spent
 FROM orders o
 JOIN users u ON o.user_id = u.id
@@ -102,31 +64,27 @@ WHERE o.status = 'paid'
 GROUP BY u.username
 ORDER BY total_spent DESC
 LIMIT 5;
+🛠 Getting Started
+Bash
+sqlite3 ecommerce.db
+.read schema.sql
+.read seed.sql
+.read indexes.sql
+📈 Roadmap
+v2: Implement full/partial refund systems, advanced indexing, and performance benchmarking.
+
+v3: Migrate schema to PostgreSQL and simulate concurrency-safe transactions.
+
+v4: Develop a REST API wrapper (Node.js or Python).
+
+🧠 Project Philosophy
+This project is about thinking like a backend architect:
+
+Design first: Planning schemas before implementation.
+
+Defensive Programming: Enforcing invariants at the lowest possible level.
+
+Iterative Growth: Treating the project as a living system that evolves through versions and migrations.
 
 
-Project Status
-
-• ✅ Schema design complete
-• ✅ Seed data populated
-• ✅ Triggers implemented for stock and payment logic
-• ✅ Basic analytical queries included
-
-Next steps (v2 planned):
-
-• Refund and partial refund handling
-• Advanced reporting and analytics
-• Performance optimization and indexing
-• Migration to other SQL databases (PostgreSQL, MySQL)
-• Integration with a backend application (Node.js / Python)
-
-Contributing
-
-This project is designed as a learning portfolio. If you want to experiment:
-
-• Make a copy of the database before making changes.
-• Add new tables, triggers, or queries in separate .sql files.
-• Keep seed data realistic for future testing.
-
-License
-
-This project is open-source for learning purposes. You may use, modify, and study the schema and queries.
+---
