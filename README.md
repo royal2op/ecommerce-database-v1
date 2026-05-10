@@ -44,7 +44,7 @@ Implemented using **SQLite Triggers** to ensure consistency across any system:
 ## 🧱 Tech Stack
 * **Database:** SQLite
 * **Design Principles:** Relational Normalization (3NF)
-* **Core Concepts:** Constraints, Triggers, Index Optimization, `EXPLAIN QUERY PLAN`
+* **Core Concepts:** Constraints, Triggers, Index Optimization, 
 
 ---
 
